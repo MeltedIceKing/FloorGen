@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<link rel="stylesheet" href="{% static 'floorgen.css' %}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Excel File</title>
+    {% load custom_filters %}
+</head>
+<body>
+<div class="container">
+    <div class="uploadarea">
+        <h1> Floor Generator </h1>
+
+        {% if error_message %}
+            <p class="error-message">{{ error_message }}</p>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }} {# This renders the hidden input by default #}
+            <button type="submit">Upload Files</button>
+            <button onClick="window.print()" class="button">Print Sheet</button>
+        </form>
+    </div>
+    <div class="graybox">
+        <div class="printarea" id="section-to-print">
+            <div class="headcolumn">
+                {% if sheet_info %}
+                    <div><h2>{{ sheet_info.0 }}</h2></div>
+                    <div><h2>Open: {{sheet_info.1}}</h2></div>
+                    <div><h2>Close: {{sheet_info.2}}</h2></div>
+                {% endif %}
+            </div>
+            <div class="tables">
+                <div class="table1">
+                    {% if data_1 %}
+                        <table>
+                            <tr>
+                                {% for header in table_headers_1 %}
+                                    <th> {{ header }} </th>
+                                {% endfor %}
+                            </tr>
+                            <tbody>
+                                {% for row in data_1 %}
+                                    <tr>
+                                        {% for rowdata in row %}
+                                            {% if forloop.counter0 == 3 %}
+                                                <td class="rowdata3"> {{rowdata}} </td>
+                                            {% elif forloop.counter0 == 4 %}
+                                                <td class="specials"> {{rowdata}} </td>
+                                            {% else %}
+                                                <td> {{rowdata}} </td>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+                {% if data_2 %}
+                    {% for rows in data_2 %}
+                        <div class="table2">
+                            <table>
+                                <tr>
+                                    {% for header in table_headers_2 %}
+                                        <th> {{ header }} </th>
+                                    {% endfor %}
+                                </tr>
+                                <tbody>
+                                    {% for row in rows %}
+                                        <tr>
+                                            {% for rowdata in row %}
+                                                {% if "Cinema" in rowdata or "IMAX" in rowdata %}
+                                                    <td class="cinema t2"> {{rowdata}} </td>
+                                                {% elif rowdata == "" %}
+                                                    <td class="empty t2"> {{rowdata}} </td>
+                                                {% elif "(18A)" in rowdata %}
+                                                    <td class="A18 t2"> {{rowdata}} </td>
+                                                {% elif "(14A)" in rowdata %}
+                                                    <td class="A14 t2"> {{rowdata}} </td>
+                                                {% elif "AM" in rowdata or "PM" in rowdata %}
+                                                    <td class="daynight t2"> {{rowdata}} </td>
+                                                {% else %}
+                                                    <td class="t2"> {{rowdata}} </td>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
